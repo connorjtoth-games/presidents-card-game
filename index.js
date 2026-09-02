@@ -1,9 +1,9 @@
 /* Node modules */
 
-var express = require('express'),
-    app = express(),
-    http = require('http').Server(app),
-    io = require('socket.io')(http);
+var express = require('express');
+var app = express();
+var http = require('http').Server(app);
+var io = require('socket.io')(http);
 
 /* Private modules */
 
@@ -19,7 +19,7 @@ app.get('/', function ( req, res ) {
   res.sendFile(__dirname + '/index.html');
 });
 
-app.use(express.static('static'));
+app.use('/',express.static('static'));
 
 var runGame;
 
@@ -27,8 +27,7 @@ var refreshLoop = setInterval(function ( ) {
   io.to('lobby').emit('refresh-member-list', Players.getList());
 }, 1000);
 
-var LISTENING_PORT = 80;
-
+var LISTENING_PORT = process.env.port || 3000;
 
 http.listen(LISTENING_PORT, function( ) {
   console.log('listening on *:' + LISTENING_PORT);
@@ -38,10 +37,10 @@ var canStartGame = function ( socket ) {
   if ( gameInProgress ) {
     throw new Error('a game is already in progress');
   }
-  else if (Players.getArr().length < 3) {
+  //TODO: Testing code
+  else if (Players.getArr().length < 1) {
     throw new Error('must have at least three players to start');
   }
-
   return true;
 }
 
@@ -95,7 +94,6 @@ var onStartGameRequest = function ( socket ) {
 var runGame = function ( players ) {
 
   var game = new Game( players );
-
 }
 
 io.on('connection', onNewConnection);
